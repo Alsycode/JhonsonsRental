@@ -7,9 +7,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Declare dbReady BEFORE using it
+let dbReady = false;
+
+// Test connection first - seed ONLY runs after success
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB error:', err));
+  .then(async () => {
+    console.log('✅ MongoDB Connected');
+    dbReady = true;
+    await seedDummy();  // Only runs AFTER connection
+  })
+  .catch(err => {
+    console.error('❌ MongoDB error:', err.message);
+    process.exit(1);  // Stop server if DB fails
+  });
 
 // Schema – price & location are stored, but not sent to public
 const propertySchema = new mongoose.Schema({
@@ -24,47 +35,61 @@ const propertySchema = new mongoose.Schema({
 
 const Property = mongoose.model('Property', propertySchema);
 
-// Seed dummy data (runs only once – comment out after first run)
 async function seedDummy() {
-  const count = await Property.countDocuments();
-  if (count === 0) {
-    await Property.insertMany([
-      {
-        title: "2BHK Near Stadium",
-        description: "Spacious 2 bedroom hall kitchen, fully furnished, good ventilation, parking available",
-        location: "Kathrikadavu, Kaloor",
-        price: "₹14,000 / month",
-        img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-room-1.jpg", // replace with real later
-        furnished: true
-      },
-      {
-        title: "1BHK Compact Flat",
-        description: "Single bedroom with attached bath, semi-furnished, close to main road",
-        location: "Panampilly Nagar side, Kaloor",
-        price: "₹9,500 / month",
-        img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-room-2.jpg",
-        furnished: false
-      },
-      {
-        title: "PG for Working Men",
-        description: "Single/double sharing, food optional, WiFi, 24h water, clean & safe",
-        location: "Near JLN Stadium, Kaloor",
-        price: "₹6,000–8,000 / month",
-        img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-pg.jpg",
-        furnished: true
-      }
-    ]);
-    console.log('Dummy properties added');
+  if (!dbReady) return console.log('⏳ Waiting for DB...');
+  
+  try {
+    const count = await Property.countDocuments();
+    console.log(`Found ${count} properties`);
+    
+    if (count === 0) {
+      await Property.insertMany([
+        {
+          title: "2BHK Near Stadium",
+          description: "Spacious 2 bedroom hall kitchen, fully furnished, good ventilation, parking available",
+          location: "Kathrikadavu, Kaloor",
+          price: "₹14,000 / month",
+          img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-room-1.jpg",
+          furnished: true
+        },
+        {
+          title: "1BHK Compact Flat",
+          description: "Single bedroom with attached bath, semi-furnished, close to main road",
+          location: "Panampilly Nagar side, Kaloor",
+          price: "₹9,500 / month",
+          img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-room-2.jpg",
+          furnished: false
+        },
+        {
+          title: "PG for Working Men",
+          description: "Single/double sharing, food optional, WiFi, 24h water, clean & safe",
+          location: "Near JLN Stadium, Kaloor",
+          price: "₹6,000–8,000 / month",
+          img: "https://res.cloudinary.com/demo/image/upload/v1690000000/sample-pg.jpg",
+          furnished: true
+        }
+      ]);
+      console.log('✅ Dummy properties added');
+    } else {
+      console.log('✅ Properties already exist, skipping seed');
+    }
+  } catch (err) {
+    console.error('Seed error:', err.message);
   }
 }
-seedDummy();
+
+// REMOVED: Don't call seedDummy() here - it runs inside .then()
 
 // Public endpoint – hides location & price
 app.get('/api/properties', async (req, res) => {
-  const properties = await Property.find()
-    .select('title description img furnished') // only send these fields
-    .sort({ createdAt: -1 });
-  res.json(properties);
+  try {
+    const properties = await Property.find()
+      .select('title description img furnished createdAt') // only send these fields
+      .sort({ createdAt: -1 });
+    res.json(properties);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch properties' });
+  }
 });
 
 // Admin endpoints (no auth beyond simple password on frontend)
@@ -79,8 +104,12 @@ app.post('/api/properties', async (req, res) => {
 });
 
 app.delete('/api/properties/:id', async (req, res) => {
-  await Property.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Deleted' });
+  try {
+    await Property.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete' });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
