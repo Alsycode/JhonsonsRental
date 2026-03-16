@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Phone, MessageCircle, MapPin, Plus, Trash2, Lock } from 'lucide-react';
 
-const BACKEND_URL = 'https://johnson-backend.onrender.com'; // ← CHANGE THIS
+const BACKEND_URL = 'https://jhonsonsrental.onrender.com'; // ← CHANGE THIS
 const CLOUD_NAME = 'ds05t0bd0';                 // ← from Cloudinary
 const UPLOAD_PRESET = 'my-blog-upload';                   // ← from Cloudinary
 
