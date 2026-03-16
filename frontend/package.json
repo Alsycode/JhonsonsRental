@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+ 
+  "build": "npm install lightningcss-linux-x64-gnu --save-optional --no-package-lock && react-scripts build",
+  "build:vercel": "npm rebuild lightningcss && npm run build",
+
+
     "lint": "eslint .",
     "preview": "vite preview"
   },
