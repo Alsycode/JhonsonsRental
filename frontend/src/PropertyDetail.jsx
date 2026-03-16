@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Phone, MessageCircle, Lock, ArrowLeft, X, Maximize2 } from 'lucide-react';
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "https://jhonsonsrental.onrender.com";
 const UNCLE_PHONE = '+919XXXXXXXXX';
 
 function PropertyDetail() {
