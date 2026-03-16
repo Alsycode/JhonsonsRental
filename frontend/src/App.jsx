@@ -3,8 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Phone, MessageCircle, MapPin, Plus, Trash2, Lock } from 'lucide-react';
 
 const BACKEND_URL = 'https://johnson-backend.onrender.com'; // ← CHANGE THIS
-const CLOUD_NAME = 'your-cloud-name-here';                 // ← from Cloudinary
-const UPLOAD_PRESET = 'johnson-rentals';                   // ← from Cloudinary
+const CLOUD_NAME = 'ds05t0bd0';                 // ← from Cloudinary
+const UPLOAD_PRESET = 'my-blog-upload';                   // ← from Cloudinary
 
 const ADMIN_PASSWORD = 'kaloor123'; // Change this later – tell uncle
 const UNCLE_PHONE = '+919XXXXXXXXX'; // ← real number
