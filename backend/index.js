@@ -122,9 +122,26 @@ require('dotenv').config();
 const app = express();
 
 // ✅ CORS setup for Vite dev server (port 5173)
+const allowedOrigins = [
+  'http://localhost:5173',      // Vite dev server
+  'http://localhost:3000',      // Create React App dev
+  'https://jhonsons-rental-jstn.vercel.app'  // Your deployed frontend
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',  // Your frontend URL
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
