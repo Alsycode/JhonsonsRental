@@ -515,7 +515,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Phone, MessageCircle, Lock } from "lucide-react";
 import PropertyDetail from "./PropertyDetail";
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "https://jhonsonsrental.onrender.com";
 const CLOUD_NAME = "ds05t0bd0";
 const UPLOAD_PRESET = "my-blog-upload";
 
